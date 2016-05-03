@@ -4,3 +4,6 @@ spec
 .gitattributes
 .gitignore
 .travis.yml
+
+spec
+src
