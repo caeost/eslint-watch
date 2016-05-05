@@ -1,12 +1,11 @@
-'use strict';
-var chalk = require('chalk');
-var c = require('./characters');
-var space = ' ';
-var Logger = require('../../log');
+import { green, white } from 'chalk';
+import c from './characters';
+import Logger from '../../log';
+
 var logger = Logger('success-formatter');
 logger.debug('loaded');
 
-module.exports = function(result){
+export default (result) => {
   logger.debug(result);
-  return chalk.green(c.check) + space + chalk.white(result.filePath);
+  return `${green(c.check)} ${white(result.filePath)}`;
 };

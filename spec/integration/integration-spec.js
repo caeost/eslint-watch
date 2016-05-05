@@ -1,4 +1,3 @@
-'use strict';
 var chai = require('chai');
 var expect = chai.expect;
 var child = require('child_process');
@@ -73,7 +72,7 @@ describe('integration', function(){
     it('finds 5 issues in test-files', function(){
       var output = esw('--no-ignore ' + testFiles);
       expect(output.error).to.be.true;
-      expect(output.message).to.have.string('7 errors');
+      expect(output.message).to.have.string('5 errors');
     });
 
     it('finds 2 warnings', function(){

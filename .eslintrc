@@ -1,8 +1,12 @@
 {
-  "env":{
-    "node": true
+  "env": {
+    "node": true,
+    "es6": true
   },
-  "rules":{
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
     "camelcase": 2,
     "eol-last": 2,
     "no-trailing-spaces": 2,

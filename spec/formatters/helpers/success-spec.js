@@ -1,15 +1,14 @@
-'use strict';
-var chai = require('chai');
-var expect = chai.expect;
-var formatter = require('../../../src/formatters/helpers/success');
-var chalk = require('chalk');
-var sinon = require('sinon');
+import { expect } from 'chai';
+import formatter from '../../../src/formatters/helpers/success';
+import chalk from 'chalk';
+import sinon from 'sinon';
 
-describe('success-helper', function(){
-  var sandbox;
-  beforeEach(function (){
+describe('success-helper', () => {
+  let sandbox;
+
+  before(() => {
     sandbox = sinon.sandbox.create();
-    var format = {
+    const format = {
       open: '',
       close: '',
       closeRe: ''
@@ -18,13 +17,13 @@ describe('success-helper', function(){
     sandbox.stub(chalk.styles, 'white', format);
   });
 
-  afterEach(function(){
+  after(() => {
     sandbox.restore();
   });
 
-  it('places a checkmark and the path', function(){
-    var object = { filePath: '/some/file/path' };
-    var result = formatter(object);
+  it('places a checkmark and the path', () =>{
+    let object = { filePath: '/some/file/path' };
+    let result = formatter(object);
     expect(result).to.equal('✓ /some/file/path');
   });
 });

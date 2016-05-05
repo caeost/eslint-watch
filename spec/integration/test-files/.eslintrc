@@ -1,6 +1,7 @@
 {
   "env":{
-    "mocha": false
+    "mocha": false,
+    "es6": false
   },
   "rules":{
     "no-unused-expressions": 0,
