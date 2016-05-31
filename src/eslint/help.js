@@ -96,13 +96,15 @@ function parseHelp(helpText){
   return newArr;
 }
 
-// rewrite in es6 this callback yucky stuff goes away.
-module.exports = function(cllbk){
+module.exports = function(){
   logger.debug('Executing help');
-  var spawn = eslint(['--help'], { help: true }, { });
-  spawn.stdout.on('data', function(msg){
-    logger.debug('Help text received');
-    var eslintHelp = msg.toString();
-    cllbk(parseHelp(eslintHelp));
-  });
+  return eslint(['--help'])
+    .then(function(msg){
+      // console.log('SUCCESS', msg);
+      logger.debug('Help text received');
+      return parseHelp(msg);
+    })
+    .catch(function(e){
+      throw e;
+    });
 };

@@ -19,29 +19,27 @@ var exitCode;
 
 function runLint(args, options){
   logger.debug(args);
-  var child = eslintCli(args, options, undefined, function onExit(code){
-    logger.debug('exitCode: %s', code);
-    exitCode = code;
-  }, function onError(err){
-    console.error(err);
-    exitCode = 1;
-  });
-  return child;
+  return eslintCli(args, options)
+    .then(console.log)
+    .catch(function(e){
+      console.log('error runLint');
+      throw e;
+    });
 }
 
-function keyListener(args, options){
+async function keyListener(args, options){
   var stdin = process.stdin;
   if(!stdin.setRawMode){
     logger.debug('Process might be wrapped exiting keybinding');
     return;
   }
   keypress(stdin);
-  stdin.on('keypress', function(ch, key){
+  stdin.on('keypress', async function(ch, key){
     logger.debug('%s was pressed', key.name);
     if(key.name === 'return'){
       logger.debug('relinting...');
       logger.debug(options);
-      runLint(args, options);
+      await runLint(args, options);
     }
     if(key.ctrl && key.name === 'c') {
       process.exit();
@@ -51,16 +49,20 @@ function keyListener(args, options){
   stdin.resume();
 }
 
-getOptions(function(options){
+async function run(){
+  const options = await getOptions();
+  logger.debug(options);
   var args = process.argv;
+
   logger.debug('Arguments passed: %o', args);
   parsedOptions = options.parse(args);
+
   logger.debug('Parsing args');
   eslArgs = argParser.parse(args, parsedOptions);
 
   if (!parsedOptions.help) {
     logger.debug('Running initial lint');
-    runLint(eslArgs, parsedOptions);
+    await runLint(eslArgs, parsedOptions);
     if (parsedOptions.watch) {
       logger.debug('-w seen');
       keyListener(eslArgs, parsedOptions);
@@ -69,7 +71,9 @@ getOptions(function(options){
   } else {
     logger.log(options.generateHelp());
   }
-});
+}
+
+run();
 
 process.on('exit', function () {
   process.exit(exitCode);

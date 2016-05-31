@@ -1,4 +1,4 @@
-var child = require('child_process');
+var executer = require('../executer');
 var path = require('path');
 var os = require('os');
 var fs = require('fs');
@@ -17,32 +17,28 @@ var eslint = (function loadEslintPath(){
     eslintPath = path.resolve(process.env._, '../eslint' + cmd);
     fs.accessSync(eslintPath);
   }
+  logger.debug(eslintPath);
   return eslintPath;
 })();
 
 logger.debug('EsLint path: %s', eslint);
-var spawn = child.spawn;
+var spawn = executer.spawn;
 
-function exitHandle(code){
-  logger.debug(code);
-}
-function errorHandle(err){
-  throw err;
-}
-
-module.exports = function(args, options, childOptions, exitHandler, errorHandler){
+module.exports = function(args, options, childOptions){
   if(!options){
     options = { _: './' };
   }
   if(options._ && options._.length === 0){
     options._ = './';
   }
-  errorHandler = errorHandler || errorHandle;
-  exitHandler = exitHandler || exitHandle;
-
-  childOptions = childOptions ? childOptions : { stdio: 'inherit' };
   logger.debug('eslint: %o', args);
-  return spawn(eslint, args, childOptions)
-    .on('error', errorHandler)// TEMP FIX - AHHHHH No plz. Just until 3.0.0
-    .on('exit', exitHandler);
+  return spawn('eslint', args, childOptions)
+    .then(function(result){
+      console.log(result)
+      return result.data;
+    }).catch(e =>{
+      console.log(e)
+      throw e;
+      // console.log('ESLINT HELP ERROR', e);
+    });
 };

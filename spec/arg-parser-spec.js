@@ -69,6 +69,13 @@ describe('arg-parser', function () {
       var arr = parser.parse([], options);
       expect(arr).to.not.contain('./');
     });
+
+    it.skip('can parse paths with spaces', function(){
+      var path = 'something/with a/space';
+      options._.push(path);
+      var arr = parser.parse([], options);
+      expect(arr).to.contain(path);
+    });
   });
 
   describe('formatters', function () {

@@ -69,7 +69,7 @@ describe('integration', function(){
   });
 
   describe('linting', function(){
-    it('finds 5 issues in test-files', function(){
+    it.only('finds 5 issues in test-files', function(){
       var output = esw('--no-ignore ' + testFiles);
       expect(output.error).to.be.true;
       expect(output.message).to.have.string('5 errors');
