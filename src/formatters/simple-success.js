@@ -1,17 +1,13 @@
-var success = require('./helpers/success');
-var error = require('./helpers/error-warning');
-var c = require('./helpers/characters');
+import success from './helpers/success';
+import error from './helpers/error-warning';
+import _ from 'lodash';
 
-module.exports = function (results) {
-  var message = '';
-  for (var i = 0; i < results.length; i++) {
-    var result = results[i];
-    if (result.errorCount === 0 && result.warningCount === 0) {
-      message += success(result) + c.endLine;
-    } else {
-      message += error(result);
-      message += c.endLine;
-    }
-  }
-  return message;
+function isSuccess(result){
+  return result.errorCount === 0 && result.warningCount === 0;
+}
+
+export default (results) => {
+  return _.reduce(results, (message, result) => {
+    return message += (isSuccess(result) ? success(result) : error(result)) + '\n';
+  }, '');
 };
