@@ -1,6 +1,6 @@
 var path = require('path');
 var _ = require('lodash');
-var logger = require('./log')('arg-parser');
+var logger = require('./logger')('arg-parser');
 logger.debug('Loaded');
 
 var simpleDetail = 'simple-detail';

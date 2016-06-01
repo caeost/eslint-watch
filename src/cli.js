@@ -5,13 +5,11 @@ var eslint = require('./eslint');
 var getOptions = require('./options');
 var watcher = require('./watcher');
 var argParser = require('./arg-parser');
-var logger = require('./log')('esw-cli');
+var logger = require('./logger')('esw-cli');
 var pkg = require('../package');
 
 logger.debug('Loaded');
 logger.debug('Eslint-Watch: ' + pkg.version);
-
-var eslintCli = eslint.cli;
 
 var parsedOptions;
 var eslArgs;
@@ -19,12 +17,7 @@ var exitCode;
 
 function runLint(args, options){
   logger.debug(args);
-  return eslintCli(args, options)
-    .then(console.log)
-    .catch(function(e){
-      console.log('error runLint');
-      throw e;
-    });
+  return eslint.execute(args, options);
 }
 
 async function keyListener(args, options){
@@ -49,8 +42,12 @@ async function keyListener(args, options){
   stdin.resume();
 }
 
-async function run(){
-  const options = await getOptions();
+process.on('exit', function () {
+  process.exit(exitCode);
+});
+
+export default async () =>{
+  let options = await getOptions();
   logger.debug(options);
   var args = process.argv;
 
@@ -64,17 +61,11 @@ async function run(){
     logger.debug('Running initial lint');
     await runLint(eslArgs, parsedOptions);
     if (parsedOptions.watch) {
-      logger.debug('-w seen');
+      logger.debug('Watch enabled');
       keyListener(eslArgs, parsedOptions);
       watcher(parsedOptions);
     }
   } else {
     logger.log(options.generateHelp());
   }
-}
-
-run();
-
-process.on('exit', function () {
-  process.exit(exitCode);
-});
+};

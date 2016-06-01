@@ -1,7 +1,7 @@
 var optionator = require('optionator');
-var getEslintOptions = require('./eslint').help;
+var eslint = require('./eslint');
 var _ = require('lodash');
-var logger = require('./log')('options');
+var logger = require('./logger')('options');
 logger.debug('Loaded');
 
 var settings = {
@@ -30,20 +30,18 @@ var myOptions = [{
   description: 'Enable file watch'
 }];
 
-module.exports = function(){
-  return getEslintOptions()
-    .then(eslintOptions =>{
-      console.log('HEY WTF')
-      var options;
-      var newOptions = _.union(myOptions, eslintOptions);
-      settings.options = newOptions;
+export default async function(){
+  // console.log('YAY')
+  const eslintOptions = await eslint.getHelp();
+  let options;
+  let newOptions = _.union(myOptions, eslintOptions);
+  settings.options = newOptions;
 
-      try {
-        options = optionator(settings);
-        return options;
-      } catch(e){
-        logger.error(e);
-        throw e;
-      }
-    });
+  try {
+    options = optionator(settings);
+    return options;
+  } catch(e){
+    logger.error(e);
+    throw e;
+  }
 };

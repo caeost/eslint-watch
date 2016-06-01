@@ -44,7 +44,7 @@ describe('Watcher', function () {
       };
     };
     watcher = proxy('../src/watcher',{
-      './log': function(){
+      './logger': function(){
         return {
           log: function(){},
           debug: function(){}

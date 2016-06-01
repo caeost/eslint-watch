@@ -1,6 +1,6 @@
 import { green, white } from 'chalk';
 import c from './characters';
-import Logger from '../../log';
+import Logger from '../../logger';
 
 var logger = Logger('success-formatter');
 logger.debug('loaded');

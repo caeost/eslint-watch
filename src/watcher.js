@@ -6,7 +6,7 @@ var path = require('path');
 
 var success = require('./formatters/helpers/success');
 var formatter = require('./formatters/simple-detail');
-var logger = require('./log')('watcher');
+var logger = require('./logger')('watcher');
 logger.debug('Loaded');
 
 var events = {

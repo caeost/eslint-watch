@@ -1,6 +1,6 @@
-var eslint = require('./cli');
+var eslint = require('./index');
 var _ = require('lodash');
-var logger = require('../log')('eslint-help');
+var logger = require('../logger')('eslint-help');
 logger.debug('Loaded');
 
 var namedOption = /^--/;
@@ -96,15 +96,11 @@ function parseHelp(helpText){
   return newArr;
 }
 
-module.exports = function(){
+export default function(){
   logger.debug('Executing help');
-  return eslint(['--help'])
-    .then(function(msg){
-      // console.log('SUCCESS', msg);
+  return eslint.execute(['--help'])
+    .then((msg) => {
       logger.debug('Help text received');
       return parseHelp(msg);
-    })
-    .catch(function(e){
-      throw e;
     });
 };

@@ -1,20 +1,20 @@
 import child from 'child_process';
 import _ from 'lodash';
 import Promise from 'bluebird';
-import Logger from './log';
+import Logger from './logger';
 
 const logger = Logger('exec');
 
 const defaults = {
-  env: process.env,
-  stdio: null
+  // env: process.env,
+  stdio: 'inherit'
 };
 
-const exec = child.exec;
 const spawn = child.spawn;
 
 export default {
-  spawn(cmd, args, options){
+  spawn: (cmd, args, options) =>{
+    logger.log('YAYAYA')
     options = _.merge(options, defaults);
     return new Promise((resolve, reject) => {
       const data = [];
@@ -53,49 +53,16 @@ export default {
         }
       });
 
+      child.on('exit', () =>{
+        console.log('EXITED')
+      })
+
       child.on('error', (e) =>{
         logger.debug('SPAWN ERROR', e);
         reject(e);
       });
-    });
-  },
-  exec(cmd, args, options){
-    options = _.merge(options, defaults);
-    return new Promise((resolve, reject) => {
-      let data;
-      let error;
-
-      const child = exec(cmd, options, (err, stdout, stderr) =>{
-        // console.log(err)
-        if(err) return reject(err);
-        data = stdout;
-        error = stderr;
-      });
-
-      child.on('close', (code) =>{
-        let results = {
-          exitCode: code
-        };
-        if(data){
-          // console.log('DATA')
-          results.data = data.trim();
-          resolve(results);
-        }
-        if(error){
-          // console.log('ERROR')
-          results.data = error.trim();
-          reject(results);
-        }
-      });
-
-      // child.on('exit', function(e){
-      //   // console.log(e, error, data);
-      // });
-
-      child.on('error', (e) => {
-        // console.log('EXEC ERROR:', e);
-        reject(e);
-      });
+    }).catch(e =>{
+      console.error('BROKEN SPAWN', e)
     });
   }
 };

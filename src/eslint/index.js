@@ -1,4 +1,7 @@
-module.exports = {
-  cli: require('./cli'),
-  help: require('./help')
+import execute from './cli';
+import getHelp from './help';
+
+export {
+  execute,
+  getHelp
 };

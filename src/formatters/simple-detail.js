@@ -3,7 +3,7 @@
 var chalk = require('chalk');
 var table = require('text-table');
 var c = require('./helpers/characters');
-var Logger = require('../log');
+var Logger = require('../logger');
 var logger = Logger('simple-detail');
 
 logger.debug('loaded');

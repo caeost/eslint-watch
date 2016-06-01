@@ -1,8 +1,13 @@
-var proxy = require('proxyquire');
 var chai = require('chai');
 var expect = chai.expect;
 var assert = chai.assert;
 var _ = require('lodash');
+var executer = require('../../src/executer');
+var sinonPromise = require('sinon-promise');
+var help = require('../../src/eslint/help');
+var sinon = require('sinon');
+
+sinonPromise(sinon);
 
 describe('eslint/help', function(){
   var title = 'title with options';
@@ -14,21 +19,10 @@ describe('eslint/help', function(){
   var noColor = '  --no-color                  Disable color in piped output';
   var doubleExample = '--color, --no-color       Enables or disables color piped output';
   var msg;
-  var help;
 
-  before(function(){
-    help = proxy('../../src/eslint/help', {
-      './cli': function(){
-        return {
-          stdout: {
-            on: function(name, callback){
-              callback(msg);
-            }
-          }
-        };
-      }
-    });
-  });
+  function resolve(msg){
+    executer.spawn = () => Promise.resolve({ statusCode: 0, data: msg });
+  }
 
   beforeEach(function(){
     msg = title + '\n' +
@@ -38,165 +32,166 @@ describe('eslint/help', function(){
         cluck + '\n' +
         noAlias + '\n' +
         noType + '\n';
+    resolve(msg);
   });
 
-  it('has an alias if one is provided', function(done){
-    help(function(options){
-      var option = options[0];
-      expect(option.alias).to.equal('c');
-      done();
-    });
-  });
-
-  it('does not have an alias if not provided', function(done){
-    help(function(options){
-      var option = options[1];
-      expect(option.alias).to.equal(undefined);
-      done();
-    });
-  });
-
-  it('has a type', function(done){
-    help(function(options){
-      var option = options[0];
-      expect(option.type).to.equal('Boolean');
-      done();
-    });
-  });
-
-  it('has a full description', function(done){
-    help(function(options){
-      var option = options[0];
-      expect(option.description).to.equal('Goes Cluck');
-      done();
-    });
-  });
-
-  it('filters out help', function(done){
-    help(function(options){
-      _.each(options, function(option){
-        assert.notEqual(option.option, 'help');
+  it('has an alias if one is provided', function(){
+    return help()
+      .then((options) =>{
+        var option = options[0];
+        expect(option.alias).to.equal('c');
       });
-      done();
-    });
   });
 
-  it('filters out format', function(done){
-        msg += '-f --format String     Stringify' + '\n';
-    help(function(options){
-      _.each(options, function(option){
-        assert.notEqual(option.option, 'format');
+  it('does not have an alias if not provided', function(){
+    return help()
+      .then((options) =>{
+        var option = options[1];
+        expect(option.alias).to.equal(undefined);
       });
-      done();
-    });
   });
 
-  it("doesn't set an option as undefined", function(done){
-    help(function(options){
-      _.each(options, function(option){
-        assert.ok(option.option);
+  it('has a type', function(){
+    return help()
+      .then((options) =>{
+        var option = options[0];
+        expect(option.type).to.equal('Boolean');
       });
-      done();
+  });
+
+  it('has a full description', function(){
+    return help()
+      .then((options) =>{
+        var option = options[0];
+        expect(option.description).to.equal('Goes Cluck');
+      });
+  });
+
+  it('filters out help', function(){
+    return help()
+      .then((options) =>{
+        _.each(options, function(option){
+          assert.notEqual(option.option, 'help');
+        });
     });
   });
 
-  it("doesn't set an alias as undefined", function(done){
-     msg = title + '\n' +
+  it('filters out format', function(){
+    msg += '-f --format String     Stringify' + '\n';
+    return help()
+      .then(options =>{
+        _.each(options, function(option){
+          expect(option.option).to.not.equal('format');
+        });
+    });
+  });
+
+  it("doesn't set an option as undefined", function(){
+    return help()
+      .then((options) =>{
+        _.each(options, function(option){
+          expect(option.option).to.be.ok;
+        });
+    });
+  });
+
+  it("doesn't set an alias as undefined", function(){
+    resolve(title + '\n' +
         '\n' +
         optionsTxt + '\n' +
         helpTxt + '\n' +
-        cluck + '\n';
-    help(function(options){
-      _.each(options, function(option){
-        assert.ok(option.alias);
+        cluck + '\n');
+    return help()
+      .then((options) =>{
+        _.each(options, function(option){
+          expect(option.alias).to.be.ok;
+        });
       });
-      done();
-    });
   });
 
-  it("doesn't set a type as undefined", function(done){
-    help(function(options){
-      _.each(options, function(option){
-        assert.ok(option.type);
+  it("doesn't set a type as undefined", function(){
+    return help()
+      .then((options) =>{
+        _.each(options, function(option){
+          expect(option.type).to.be.ok;
+        });
       });
-      done();
-    });
   });
 
-  it("doesn't set a description as undefined", function(done){
-    help(function(options){
-      _.each(options, function(option){
-        assert.ok(option.description);
+  it("doesn't set a description as undefined", function(){
+    return help()
+      .then((options) =>{
+        _.each(options, (option) => {
+          expect(option.description).to.be.ok;
+        });
       });
-      done();
-    });
   });
 
-  it("sets the default to Boolean if type isn't provided", function(done){
-    help(function(options){
-      var option = options[2];
-      expect(option.type).to.equal('Boolean');
-      done();
-    });
+  it("sets the default to Boolean if type isn't provided", function(){
+    return help()
+      .then((options) =>{
+        var option = options[2];
+        expect(option.type).to.equal('Boolean');
+      });
   });
 
-  it("shouldn't throw exceptions", function(done){
-    msg = title + '\n' +
+  it("shouldn't throw exceptions", function(){
+    resolve(title + '\n' +
        '\n' +
        optionsTxt + '\n' +
        helpTxt + '\n' +
        '\n' +
        'HEADING:\n'+
-       cluck + '\n';
-    expect(function(){
-      help(function(options){
+       cluck + '\n');
+    return help()
+      .then(options =>{
         var option = options[0];
         expect(option.type).to.equal('Boolean');
-        done();
       });
-    }).to.not.throw();
   });
 
-  it('filters out no from help options', function(done) {
-    msg = title + '\n' +
+  it('filters out no from help options', function() {
+    resolve(title + '\n' +
        '\n' +
        optionsTxt + '\n' +
        helpTxt + '\n' +
        '\n' +
        'HEADING:\n'+
-       noColor + '\n';
-    help(function(options) {
-      var colorOption = options[0];
-      expect(colorOption.option).to.equal('color');
-      done();
-    });
+       noColor + '\n');
+    return help()
+      .then((options) => {
+        var colorOption = options[0];
+        expect(colorOption.option).to.equal('color');
+      });
   });
 
-  it('defaults no options to true', function(done){
-    msg = title + '\n' +
+  it('defaults no options to true', function(){
+    resolve(title + '\n' +
        '\n' +
        optionsTxt + '\n' +
        helpTxt + '\n' +
        '\n' +
        'HEADING:\n'+
-       noColor + '\n';
+       noColor + '\n');
 
-       help(function(options){
+    return help()
+      .then((options) => {
         var colorOption = options[0];
         expect(colorOption.default).to.equal('true');
-        done();
        });
   });
 
-  it('can parse doubled option options', function(done){
-    msg = title + '\n' +
+  it('can parse doubled option options', function(){
+    resolve(title + '\n' +
        '\n' +
        optionsTxt + '\n' +
        helpTxt + '\n' +
        '\n' +
        'HEADING:\n'+
-       doubleExample + '\n';
-       help(function(options){
+       doubleExample + '\n');
+
+    return help()
+      .then((options) =>{
          var colorOption = options[0];
          expect(colorOption).to.eql({
            option: 'color',
@@ -204,7 +199,6 @@ describe('eslint/help', function(){
            alias: 'no-color',
            description: 'Enables or disables color piped output'
          });
-         done();
        });
   });
 });
