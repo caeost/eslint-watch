@@ -3,11 +3,7 @@ var expect = chai.expect;
 var assert = chai.assert;
 var _ = require('lodash');
 var executer = require('../../src/executer');
-var sinonPromise = require('sinon-promise');
 var help = require('../../src/eslint/help');
-var sinon = require('sinon');
-
-sinonPromise(sinon);
 
 describe('eslint/help', function(){
   var title = 'title with options';

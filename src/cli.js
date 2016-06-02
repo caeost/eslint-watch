@@ -15,9 +15,11 @@ var parsedOptions;
 var eslArgs;
 var exitCode;
 
-function runLint(args, options){
+async function runLint(args, options){
   logger.debug(args);
-  return eslint.execute(args, options);
+  let result = await eslint.execute(args, options);
+  logger.log(result);
+  return result;
 }
 
 async function keyListener(args, options){
@@ -35,7 +37,7 @@ async function keyListener(args, options){
       await runLint(args, options);
     }
     if(key.ctrl && key.name === 'c') {
-      process.exit();
+      process.kill(process.pid, 'SIGINT');
     }
   });
   stdin.setRawMode(true);

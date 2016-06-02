@@ -13,6 +13,9 @@ export default (args, options, childOptions) => {
 
   return executer.spawn(eslintPath, args, childOptions)
     .then(function(result){
-      return result.data;
+      if(result){
+        return result.data;
+      }
+      throw new Error('No results returned from Eslint. Check and see if Eslint is installed.');
     });
 };
