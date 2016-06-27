@@ -46,6 +46,7 @@ Options:
   -h, --help                  Show help
   -f, --format String         Use a specific output format - default: simple-detail
   -w, --watch                 Enable file watch
+  -A, --lint-all              Enable linting the entire directory on file change rather than a single file. - default: false
   -c, --config path::String   Use configuration from this file or shareable config
   --no-eslintrc               Disable use of configuration from .eslintrc
   --env [String]              Specify environments

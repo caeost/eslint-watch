@@ -29,6 +29,12 @@ var myOptions = [{
   alias: 'w',
   type: 'Boolean',
   description: 'Enable file watch'
+},{
+  option: 'lint-all',
+  alias: 'A',
+  type: 'Boolean',
+  default: false,
+  description: 'Enable linting the entire directory on file change rather than a single file. - default: false'
 }];
 
 module.exports = function(cllbk){
